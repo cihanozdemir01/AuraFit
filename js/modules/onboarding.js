@@ -23,6 +23,7 @@ class Onboarding {
       goal: 'lose_fat', // lose_fat, build_muscle, get_fit, body_recomp, build_strength, endurance
       targetPhysique: 'fit', // athletic, lean, bulk, fit, bodybuilder, v_shape, custom
       customPhysique: '',
+      experienceLevel: 'beginner', // beginner, intermediate, advanced
       environment: 'gym', // home, gym
       equipments: []
     };
@@ -220,6 +221,24 @@ class Onboarding {
               <label for="ob-custom-physique">Fizik Hedefinizi Açıklayın</label>
               <textarea id="ob-custom-physique" name="customPhysique" placeholder="Hayalinizdeki fiziği kısaca tarif edin..."></textarea>
             </div>
+
+            <div class="form-group" style="margin-top: 10px;">
+              <label>Spor Deneyim Seviyeniz</label>
+              <div class="grid-options" id="ob-level-grid">
+                <div class="grid-option-card selected" data-value="beginner">
+                  <i class="fas fa-seedling"></i>
+                  <span>Başlangıç</span>
+                </div>
+                <div class="grid-option-card" data-value="intermediate">
+                  <i class="fas fa-medal"></i>
+                  <span>Orta Seviye</span>
+                </div>
+                <div class="grid-option-card" data-value="advanced">
+                  <i class="fas fa-crown"></i>
+                  <span>İleri Seviye</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- STEP 4: Çalışma Ortamı & Ekipmanlar -->
@@ -332,6 +351,16 @@ class Onboarding {
         } else {
           customPhysiqueContainer.style.display = 'none';
         }
+      });
+    });
+
+    // Step 3 Level Card click handler
+    const levelCards = overlay.querySelectorAll('#ob-level-grid .grid-option-card');
+    levelCards.forEach(card => {
+      card.addEventListener('click', () => {
+        levelCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        this.formData.experienceLevel = card.dataset.value;
       });
     });
 
@@ -501,6 +530,7 @@ class Onboarding {
       goal: this.formData.goal,
       targetPhysique: this.formData.targetPhysique,
       customPhysique: this.formData.customPhysique,
+      experienceLevel: this.formData.experienceLevel,
       activityLevel: this.formData.activityLevel,
       lifestyle: this.formData.lifestyle,
       workoutEnvironment: this.formData.environment
