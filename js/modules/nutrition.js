@@ -1,5 +1,26 @@
 import { store } from '../store.js';
 
+const LOCAL_FOODS_DB = [
+  { name: 'Tavuk Göğsü (Izgara)', calories: 165, protein: 31, carbs: 0, fats: 3.6 },
+  { name: 'Dana Bonfile (Izgara)', calories: 150, protein: 26, carbs: 0, fats: 5 },
+  { name: 'Yumurta (Haşlanmış)', calories: 155, protein: 13, carbs: 1.1, fats: 11 },
+  { name: 'Yulaf Ezmesi', calories: 389, protein: 16.9, carbs: 66, fats: 6.9 },
+  { name: 'Muz', calories: 89, protein: 1.1, carbs: 23, fats: 0.3 },
+  { name: 'Elma', calories: 52, protein: 0.3, carbs: 14, fats: 0.2 },
+  { name: 'Pirinç Pilavı (Pişmiş)', calories: 130, protein: 2.7, carbs: 28, fats: 0.3 },
+  { name: 'Bulgur Pilavı (Pişmiş)', calories: 121, protein: 3.1, carbs: 26, fats: 0.6 },
+  { name: 'Süzme Yoğurt', calories: 97, protein: 9, carbs: 4, fats: 5 },
+  { name: 'Lor Peyniri', calories: 90, protein: 13, carbs: 3, fats: 2.2 },
+  { name: 'Fıstık Ezmesi', calories: 588, protein: 25, carbs: 20, fats: 50 },
+  { name: 'Badem (Çiğ)', calories: 579, protein: 21, carbs: 22, fats: 49 },
+  { name: 'Ceviz', calories: 654, protein: 15, carbs: 14, fats: 65 },
+  { name: 'Somon Fırın', calories: 206, protein: 22, carbs: 0, fats: 13 },
+  { name: 'Hindi Göğsü (Izgara)', calories: 135, protein: 30, carbs: 0, fats: 1 },
+  { name: 'Beyaz Peynir', calories: 260, protein: 14, carbs: 2.5, fats: 21 },
+  { name: 'Tam Buğday Ekmeği (1 dilim)', calories: 70, protein: 3, carbs: 13, fats: 1 }
+];
+
+
 class NutritionEngine {
   constructor() {
     this.mealDatabase = {
@@ -130,6 +151,17 @@ class NutritionEngine {
     // Get suggested meals
     const meals = this.getSuggestedMeals(user.goal);
 
+    // Compute macro progress percentages
+    const proteinPerc = Math.min(100, Math.round(((nutrition.proteinIntake || 0) / nutrition.proteinTarget) * 100)) || 0;
+    const carbsPerc = Math.min(100, Math.round(((nutrition.carbsIntake || 0) / nutrition.carbsTarget) * 100)) || 0;
+    const fatsPerc = Math.min(100, Math.round(((nutrition.fatsIntake || 0) / nutrition.fatsTarget) * 100)) || 0;
+
+    const completedMeals = nutrition.completedMeals || [];
+    const isBreakfastChecked = completedMeals.includes('breakfast');
+    const isLunchChecked = completedMeals.includes('lunch');
+    const isDinnerChecked = completedMeals.includes('dinner');
+    const isSnackChecked = completedMeals.includes('snack');
+
     container.innerHTML = `
       <div class="page-header">
         <div>
@@ -144,10 +176,10 @@ class NutritionEngine {
           <div class="glass-card">
             <h2 style="font-family: var(--font-display); font-size: 20px; margin-bottom: 16px;">Bugünkü Hedef Makrolar</h2>
             
-            <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
               <div>
-                <span style="font-size: 32px; font-weight: 800; font-family: var(--font-display); color: var(--accent-orange);">${nutrition.caloriesTarget}</span>
-                <span class="text-secondary" style="font-size: 14px;"> kcal / Gün</span>
+                <span style="font-size: 32px; font-weight: 800; font-family: var(--font-display); color: var(--accent-orange);">${nutrition.caloriesIntake || 0}</span>
+                <span class="text-secondary" style="font-size: 14px;"> / ${nutrition.caloriesTarget} kcal Alındı</span>
               </div>
               <div class="text-secondary" style="font-size: 13px; text-align: right;">
                 Bazal Metabolizma: ${Math.round(nutrition.caloriesTarget * 0.8)} kcal<br>
@@ -158,31 +190,31 @@ class NutritionEngine {
             <div class="nutrition-bars">
               <div class="macro-bar-item">
                 <div class="macro-bar-label">
-                  <span>Protein <small class="text-secondary">(2.0x Kilo)</small></span>
-                  <strong>${nutrition.proteinTarget}g <span class="text-secondary">(${nutrition.proteinTarget * 4} kcal)</span></strong>
+                  <span>Protein <small class="text-secondary">(Hedef: ${nutrition.proteinTarget}g)</small></span>
+                  <strong>${nutrition.proteinIntake || 0}g <span class="text-secondary">(${proteinPerc}%)</span></strong>
                 </div>
                 <div class="macro-bar-bg">
-                  <div class="macro-bar-fill protein" style="width: 100%;"></div>
+                  <div class="macro-bar-fill protein" style="width: ${proteinPerc}%;"></div>
                 </div>
               </div>
               
               <div class="macro-bar-item">
                 <div class="macro-bar-label">
-                  <span>Karbonhidrat</span>
-                  <strong>${nutrition.carbsTarget}g <span class="text-secondary">(${nutrition.carbsTarget * 4} kcal)</span></strong>
+                  <span>Karbonhidrat <small class="text-secondary">(Hedef: ${nutrition.carbsTarget}g)</small></span>
+                  <strong>${nutrition.carbsIntake || 0}g <span class="text-secondary">(${carbsPerc}%)</span></strong>
                 </div>
                 <div class="macro-bar-bg">
-                  <div class="macro-bar-fill carbs" style="width: 100%;"></div>
+                  <div class="macro-bar-fill carbs" style="width: ${carbsPerc}%;"></div>
                 </div>
               </div>
 
               <div class="macro-bar-item">
                 <div class="macro-bar-label">
-                  <span>Yağ</span>
-                  <strong>${nutrition.fatsTarget}g <span class="text-secondary">(${nutrition.fatsTarget * 9} kcal)</span></strong>
+                  <span>Yağ <small class="text-secondary">(Hedef: ${nutrition.fatsTarget}g)</small></span>
+                  <strong>${nutrition.fatsIntake || 0}g <span class="text-secondary">(${fatsPerc}%)</span></strong>
                 </div>
                 <div class="macro-bar-bg">
-                  <div class="macro-bar-fill fats" style="width: 100%;"></div>
+                  <div class="macro-bar-fill fats" style="width: ${fatsPerc}%;"></div>
                 </div>
               </div>
             </div>
@@ -194,34 +226,128 @@ class NutritionEngine {
             <p class="text-secondary" style="font-size: 12px; margin-top: 2px;">Hedef makrolarınıza özel hazırlanan dengeli öğünler.</p>
             
             <div class="meal-list">
-              <div class="meal-item">
+              <div class="meal-item" style="align-items: center;">
+                <div class="check-btn ${isBreakfastChecked ? 'checked' : ''}" data-meal="breakfast" style="margin-right: 12px; flex-shrink: 0;">
+                  <i class="fas fa-check"></i>
+                </div>
                 <div class="meal-icon-box"><i class="fas fa-coffee"></i></div>
                 <div class="meal-content">
-                  <div class="meal-name">Kahvaltı</div>
+                  <div class="meal-name">Kahvaltı <small class="text-secondary">(${Math.round(nutrition.caloriesTarget * 0.3)} kcal)</small></div>
                   <div class="meal-foods">${meals.breakfast.name} : ${meals.breakfast.foods}</div>
                 </div>
               </div>
-              <div class="meal-item">
+              <div class="meal-item" style="align-items: center;">
+                <div class="check-btn ${isLunchChecked ? 'checked' : ''}" data-meal="lunch" style="margin-right: 12px; flex-shrink: 0;">
+                  <i class="fas fa-check"></i>
+                </div>
                 <div class="meal-icon-box"><i class="fas fa-utensils"></i></div>
                 <div class="meal-content">
-                  <div class="meal-name">Öğle Yemeği</div>
+                  <div class="meal-name">Öğle Yemeği <small class="text-secondary">(${Math.round(nutrition.caloriesTarget * 0.35)} kcal)</small></div>
                   <div class="meal-foods">${meals.lunch.name} : ${meals.lunch.foods}</div>
                 </div>
               </div>
-              <div class="meal-item">
+              <div class="meal-item" style="align-items: center;">
+                <div class="check-btn ${isDinnerChecked ? 'checked' : ''}" data-meal="dinner" style="margin-right: 12px; flex-shrink: 0;">
+                  <i class="fas fa-check"></i>
+                </div>
                 <div class="meal-icon-box"><i class="fas fa-cloud-sun"></i></div>
                 <div class="meal-content">
-                  <div class="meal-name">Akşam Yemeği</div>
+                  <div class="meal-name">Akşam Yemeği <small class="text-secondary">(${Math.round(nutrition.caloriesTarget * 0.25)} kcal)</small></div>
                   <div class="meal-foods">${meals.dinner.name} : ${meals.dinner.foods}</div>
                 </div>
               </div>
-              <div class="meal-item">
+              <div class="meal-item" style="align-items: center;">
+                <div class="check-btn ${isSnackChecked ? 'checked' : ''}" data-meal="snack" style="margin-right: 12px; flex-shrink: 0;">
+                  <i class="fas fa-check"></i>
+                </div>
                 <div class="meal-icon-box"><i class="fas fa-cookie-bite"></i></div>
                 <div class="meal-content">
-                  <div class="meal-name">Ara Öğün</div>
+                  <div class="meal-name">Ara Öğün <small class="text-secondary">(${Math.round(nutrition.caloriesTarget * 0.1)} kcal)</small></div>
                   <div class="meal-foods">${meals.snack.name} : ${meals.snack.foods}</div>
                 </div>
               </div>
+            </div>
+            <button class="btn btn-primary" id="save-nutrition-btn" style="width: 100%; margin-top: 20px;">
+              <i class="fas fa-save"></i> Günlük Öğünleri Kaydet
+            </button>
+          </div>
+
+          <!-- Extra Foods Logging Card -->
+          <div class="glass-card" style="margin-top: 24px;">
+            <h2 style="font-family: var(--font-display); font-size: 20px; margin-bottom: 8px;">Ekstra Tüketilen Besinler</h2>
+            <p class="text-secondary" style="font-size: 12px; margin-bottom: 16px;">Tükettiğiniz ekstra yiyecekleri kütüphaneden aratarak veya elle girerek listenize ekleyin.</p>
+            
+            <form id="extra-food-form" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px;">
+              <div class="form-row" style="grid-template-columns: 2.5fr 1fr; gap: 16px;">
+                <div class="form-group">
+                  <label for="extra-food-name">Yiyecek Adı</label>
+                  <input type="text" id="extra-food-name" list="foods-datalist" placeholder="Arayın... Örn: Muz" required style="font-size: 14px;">
+                  <datalist id="foods-datalist">
+                    ${LOCAL_FOODS_DB.map(f => `<option value="${f.name}"></option>`).join('')}
+                  </datalist>
+                </div>
+                <div class="form-group">
+                  <label for="extra-food-weight">Miktar (gr)</label>
+                  <input type="number" id="extra-food-weight" value="100" min="1" required style="font-size: 14px;">
+                </div>
+              </div>
+
+              <!-- Manual toggle -->
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="extra-food-manual-toggle" style="width: 16px; height: 16px; accent-color: var(--accent-orange); cursor: pointer;">
+                <label for="extra-food-manual-toggle" style="cursor: pointer; font-size: 12px; user-select: none;">Değerleri Kendim Gireceğim</label>
+              </div>
+
+              <!-- Manual inputs (hidden by default) -->
+              <div id="extra-food-manual-fields" class="form-row" style="display: none; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 4px;">
+                <div class="form-group">
+                  <label style="font-size: 11px;">Kalori (kcal)</label>
+                  <input type="number" id="manual-calories" placeholder="0" min="0" style="padding: 8px 10px; font-size: 13px;">
+                </div>
+                <div class="form-group">
+                  <label style="font-size: 11px;">Prot (g)</label>
+                  <input type="number" id="manual-protein" placeholder="0" min="0" style="padding: 8px 10px; font-size: 13px;">
+                </div>
+                <div class="form-group">
+                  <label style="font-size: 11px;">Karb (g)</label>
+                  <input type="number" id="manual-carbs" placeholder="0" min="0" style="padding: 8px 10px; font-size: 13px;">
+                </div>
+                <div class="form-group">
+                  <label style="font-size: 11px;">Yağ (g)</label>
+                  <input type="number" id="manual-fats" placeholder="0" min="0" style="padding: 8px 10px; font-size: 13px;">
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="align-self: flex-end; padding: 10px 20px; font-size: 13px;">
+                <i class="fas fa-plus-circle"></i> Ekle
+              </button>
+            </form>
+
+            <!-- Extra Food Log List -->
+            <div id="extra-foods-log-container" style="border-top: 1px solid var(--border-color); padding-top: 16px;">
+              <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Bugün Eklenenler</h3>
+              ${nutrition.extraFoodsLog && nutrition.extraFoodsLog.length > 0 ? `
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                  ${nutrition.extraFoodsLog.map(food => `
+                    <div class="meal-item" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: 10px; background-color: rgba(255,255,255,0.01);">
+                      <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="meal-icon-box" style="width: 32px; height: 32px; border-radius: 8px; background-color: rgba(255, 109, 0, 0.05); font-size: 14px;"><i class="fas fa-seedling"></i></div>
+                        <div>
+                          <div style="font-size: 14px; font-weight: 600;">${food.name} <small class="text-secondary">(${food.weight}g)</small></div>
+                          <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+                            ${food.calories} kcal • P: ${food.protein}g • K: ${food.carbs}g • Y: ${food.fats}g
+                          </div>
+                        </div>
+                      </div>
+                      <button class="btn-delete-extra" data-id="${food.id}" style="background: transparent; border: none; color: var(--accent-pink); cursor: pointer; padding: 6px; font-size: 14px; transition: var(--transition-fast);">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </div>
+                  `).join('')}
+                </div>
+              ` : `
+                <p class="text-secondary text-center" style="font-size: 12px; padding: 10px 0;">Henüz ekstra besin eklenmedi.</p>
+              `}
             </div>
           </div>
         </div>
@@ -274,6 +400,95 @@ class NutritionEngine {
         const updatedWaterPerc = Math.min(100, Math.round((updatedState.nutrition.waterIntake / waterGoal) * 100));
         document.getElementById('water-liquid').style.height = `${updatedWaterPerc}%`;
         document.getElementById('water-val-display').innerText = `${updatedState.nutrition.waterIntake}`;
+      });
+    });
+
+    // Bind Meal Checklist Click Events
+    container.querySelectorAll('.meal-list .check-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const mealKey = btn.dataset.meal;
+        store.toggleMealComplete(mealKey);
+        this.renderNutritionTab(container);
+      });
+    });
+
+    // Bind Meal Save Button Click
+    container.querySelector('#save-nutrition-btn')?.addEventListener('click', () => {
+      alert('Günlük beslenme planınız ve aldığınız makrolar başarıyla kaydedildi!');
+    });
+
+    // Toggle manual entry fields
+    const manualToggle = container.querySelector('#extra-food-manual-toggle');
+    const manualFields = container.querySelector('#extra-food-manual-fields');
+    manualToggle?.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        manualFields.style.display = 'grid';
+        container.querySelector('#manual-calories').required = true;
+      } else {
+        manualFields.style.display = 'none';
+        container.querySelector('#manual-calories').required = false;
+      }
+    });
+
+    // Handle extra food form submission
+    container.querySelector('#extra-food-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const nameInput = container.querySelector('#extra-food-name');
+      const weightInput = container.querySelector('#extra-food-weight');
+      const isManual = manualToggle?.checked;
+      
+      const foodName = nameInput.value.trim();
+      const weight = parseInt(weightInput.value);
+      
+      let calories = 0;
+      let protein = 0;
+      let carbs = 0;
+      let fats = 0;
+      
+      if (isManual) {
+        calories = Math.round(parseFloat(container.querySelector('#manual-calories').value) || 0);
+        protein = Math.round(parseFloat(container.querySelector('#manual-protein').value) || 0);
+        carbs = Math.round(parseFloat(container.querySelector('#manual-carbs').value) || 0);
+        fats = Math.round(parseFloat(container.querySelector('#manual-fats').value) || 0);
+      } else {
+        // Find in local DB
+        const match = LOCAL_FOODS_DB.find(f => f.name.toLowerCase() === foodName.toLowerCase());
+        if (match) {
+          const ratio = weight / 100;
+          calories = Math.round(match.calories * ratio);
+          protein = Math.round(match.protein * ratio);
+          carbs = Math.round(match.carbs * ratio);
+          fats = Math.round(match.fats * ratio);
+        } else {
+          alert('Bu yiyecek kütüphanede bulunamadı. Lütfen "Değerleri Kendim Gireceğim" kutusunu işaretleyerek değerleri girin.');
+          manualToggle.checked = true;
+          manualFields.style.display = 'grid';
+          container.querySelector('#manual-calories').required = true;
+          return;
+        }
+      }
+      
+      store.addExtraFood({
+        name: foodName,
+        weight: weight,
+        calories: calories,
+        protein: protein,
+        carbs: carbs,
+        fats: fats
+      });
+      
+      this.renderNutritionTab(container);
+    });
+
+    // Bind Delete Extra Food buttons
+    container.querySelectorAll('.btn-delete-extra').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.id;
+        store.deleteExtraFood(id);
+        this.renderNutritionTab(container);
       });
     });
 
