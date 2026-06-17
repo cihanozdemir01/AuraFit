@@ -12,8 +12,14 @@ const DEFAULT_STATE = {
     proteinTarget: 0,
     carbsTarget: 0,
     fatsTarget: 0,
+    caloriesIntake: 0,
+    proteinIntake: 0,
+    carbsIntake: 0,
+    fatsIntake: 0,
     waterIntake: 0,
-    waterTarget: 2500
+    waterTarget: 2500,
+    completedMeals: [],
+    extraFoodsLog: []
   },
   supplements: [], // Array of { id, name, dosage, timing, note }
   onboardingComplete: false
@@ -31,6 +37,9 @@ class Store {
       if (data) {
         // Deep merge with default state to prevent missing properties if schema updates
         const parsed = JSON.parse(data);
+        if (parsed.nutrition) {
+          parsed.nutrition = { ...DEFAULT_STATE.nutrition, ...parsed.nutrition };
+        }
         return { ...DEFAULT_STATE, ...parsed };
       }
     } catch (e) {
@@ -203,6 +212,96 @@ class Store {
   completeOnboarding() {
     this.updateState(state => {
       state.onboardingComplete = true;
+      return state;
+    });
+  }
+
+  toggleMealComplete(mealKey) {
+    this.updateState(state => {
+      if (!state.nutrition) {
+        state.nutrition = { ...DEFAULT_STATE.nutrition };
+      }
+      if (!state.nutrition.completedMeals) {
+        state.nutrition.completedMeals = [];
+      }
+      
+      const idx = state.nutrition.completedMeals.indexOf(mealKey);
+      
+      // Meal coefficients: breakfast: 30%, lunch: 35%, dinner: 25%, snack: 10%
+      const coefficients = {
+        breakfast: 0.30,
+        lunch: 0.35,
+        dinner: 0.25,
+        snack: 0.10
+      };
+      const coeff = coefficients[mealKey] || 0.25;
+
+      const caloriesDiff = Math.round(state.nutrition.caloriesTarget * coeff);
+      const proteinDiff = Math.round(state.nutrition.proteinTarget * coeff);
+      const carbsDiff = Math.round(state.nutrition.carbsTarget * coeff);
+      const fatsDiff = Math.round(state.nutrition.fatsTarget * coeff);
+
+      if (idx > -1) {
+        // Uncheck meal
+        state.nutrition.completedMeals.splice(idx, 1);
+        state.nutrition.caloriesIntake = Math.max(0, (state.nutrition.caloriesIntake || 0) - caloriesDiff);
+        state.nutrition.proteinIntake = Math.max(0, (state.nutrition.proteinIntake || 0) - proteinDiff);
+        state.nutrition.carbsIntake = Math.max(0, (state.nutrition.carbsIntake || 0) - carbsDiff);
+        state.nutrition.fatsIntake = Math.max(0, (state.nutrition.fatsIntake || 0) - fatsDiff);
+      } else {
+        // Check meal
+        state.nutrition.completedMeals.push(mealKey);
+        state.nutrition.caloriesIntake = (state.nutrition.caloriesIntake || 0) + caloriesDiff;
+        state.nutrition.proteinIntake = (state.nutrition.proteinIntake || 0) + proteinDiff;
+        state.nutrition.carbsIntake = (state.nutrition.carbsIntake || 0) + carbsDiff;
+        state.nutrition.fatsIntake = (state.nutrition.fatsIntake || 0) + fatsDiff;
+      }
+      return state;
+    });
+  }
+
+  addExtraFood(food) {
+    this.updateState(state => {
+      if (!state.nutrition) {
+        state.nutrition = { ...DEFAULT_STATE.nutrition };
+      }
+      if (!state.nutrition.extraFoodsLog) {
+        state.nutrition.extraFoodsLog = [];
+      }
+      
+      const newFood = {
+        id: Date.now().toString(),
+        ...food
+      };
+      
+      state.nutrition.extraFoodsLog.push(newFood);
+      
+      // Update intakes
+      state.nutrition.caloriesIntake = (state.nutrition.caloriesIntake || 0) + food.calories;
+      state.nutrition.proteinIntake = (state.nutrition.proteinIntake || 0) + food.protein;
+      state.nutrition.carbsIntake = (state.nutrition.carbsIntake || 0) + food.carbs;
+      state.nutrition.fatsIntake = (state.nutrition.fatsIntake || 0) + food.fats;
+      
+      return state;
+    });
+  }
+
+  deleteExtraFood(foodId) {
+    this.updateState(state => {
+      if (!state.nutrition || !state.nutrition.extraFoodsLog) return state;
+      
+      const foodIndex = state.nutrition.extraFoodsLog.findIndex(f => f.id === foodId);
+      if (foodIndex > -1) {
+        const food = state.nutrition.extraFoodsLog[foodIndex];
+        
+        // Subtract from intakes
+        state.nutrition.caloriesIntake = Math.max(0, (state.nutrition.caloriesIntake || 0) - food.calories);
+        state.nutrition.proteinIntake = Math.max(0, (state.nutrition.proteinIntake || 0) - food.protein);
+        state.nutrition.carbsIntake = Math.max(0, (state.nutrition.carbsIntake || 0) - food.carbs);
+        state.nutrition.fatsIntake = Math.max(0, (state.nutrition.fatsIntake || 0) - food.fats);
+        
+        state.nutrition.extraFoodsLog.splice(foodIndex, 1);
+      }
       return state;
     });
   }
