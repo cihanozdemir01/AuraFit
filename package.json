@@ -1,0 +1,12 @@
+{
+  "name": "aurafit-mvp",
+  "version": "1.0.0",
+  "description": "AuraFit - Personal Fitness & Nutrition MVP",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite"
+  },
+  "devDependencies": {
+    "vite": "^4.5.3"
+  }
+}

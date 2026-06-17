@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuraFit — Kişiselleştirilmiş Fitness & Beslenme MVP</title>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Vanilla CSS Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  
+  <div class="app-container">
+    <!-- Navigation Sidebar (Desktop) / Navigation Bottom-bar (Mobile) -->
+    <nav class="sidebar" id="navigation-sidebar">
+      <div class="logo-container">
+        <div class="logo-icon">A</div>
+        <span class="logo-text">AuraFit</span>
+      </div>
+      
+      <ul class="nav-links">
+        <li>
+          <a class="nav-item active" data-tab="dashboard">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-tab="workout">
+            <i class="fas fa-dumbbell"></i>
+            <span>Antrenman</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-tab="nutrition">
+            <i class="fas fa-apple-alt"></i>
+            <span>Beslenme</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-tab="progress">
+            <i class="fas fa-chart-line"></i>
+            <span>Gelişim</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-tab="profile">
+            <i class="fas fa-user-circle"></i>
+            <span>Profil</span>
+          </a>
+        </li>
+      </ul>
+      
+      <!-- User profile quick view in sidebar footer -->
+      <div class="user-profile-summary" id="sidebar-profile-summary">
+        <div class="avatar" id="sidebar-avatar">U</div>
+        <div class="user-summary-details">
+          <div class="user-summary-name" id="sidebar-name">Misafir Kullanıcı</div>
+          <div class="user-summary-goal" id="sidebar-goal">Hedef Belirlenmedi</div>
+        </div>
+      </div>
+    </nav>
+    
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Dashboard View -->
+      <section id="dashboard" class="page-view active"></section>
+      
+      <!-- Workout View -->
+      <section id="workout" class="page-view"></section>
+      
+      <!-- Nutrition View -->
+      <section id="nutrition" class="page-view"></section>
+      
+      <!-- Progress View -->
+      <section id="progress" class="page-view"></section>
+      
+      <!-- Profile View -->
+      <section id="profile" class="page-view"></section>
+    </main>
+  </div>
+
+  <!-- Bootstrapping Script (ES6 Modules) -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
