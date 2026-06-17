@@ -112,6 +112,15 @@ class ProfileModule {
                 </select>
               </div>
 
+              <div class="form-group">
+                <label for="pe-level">Spor Deneyim Seviyeniz</label>
+                <select id="pe-level" required>
+                  <option value="beginner" ${user.experienceLevel === 'beginner' ? 'selected' : ''}>Başlangıç</option>
+                  <option value="intermediate" ${user.experienceLevel === 'intermediate' ? 'selected' : ''}>Orta Seviye</option>
+                  <option value="advanced" ${user.experienceLevel === 'advanced' ? 'selected' : ''}>İleri Seviye</option>
+                </select>
+              </div>
+
               <div class="form-group" id="pe-custom-physique-container" style="display: ${user.targetPhysique === 'custom' ? 'flex' : 'none'};">
                 <label for="pe-custom-physique">Fizik Hedefi Açıklaması</label>
                 <textarea id="pe-custom-physique" placeholder="Hayalinizdeki fiziği kısaca tarif edin...">${user.customPhysique || ''}</textarea>
@@ -165,6 +174,7 @@ class ProfileModule {
         const environment = container.querySelector('#pe-env').value;
         const targetPhysique = physiqueSelect.value;
         const customPhysique = container.querySelector('#pe-custom-physique').value.trim();
+        const experienceLevel = container.querySelector('#pe-level').value;
 
         // 1. Check if weight changed, if so add measurement
         const weightChanged = user.weight !== weight;
@@ -180,7 +190,8 @@ class ProfileModule {
           goal,
           targetPhysique,
           customPhysique: targetPhysique === 'custom' ? customPhysique : '',
-          workoutEnvironment: environment
+          workoutEnvironment: environment,
+          experienceLevel
         };
 
         store.setUser(updatedUser);
@@ -265,14 +276,18 @@ class ProfileModule {
               <span class="profile-detail-val">${this.translateActivity(user.activityLevel)}</span>
             </div>
             <div class="profile-detail-row">
-              <span class="profile-detail-lbl">Ortam</span>
-              <span class="profile-detail-val">${user.workoutEnvironment === 'gym' ? 'Spor Salonu' : 'Ev'}</span>
-            </div>
-            <div class="profile-detail-row">
-              <span class="profile-detail-lbl">Hedef Vücut</span>
-              <span class="profile-detail-val" style="text-transform: capitalize;">${user.targetPhysique === 'custom' ? user.customPhysique : user.targetPhysique}</span>
-            </div>
-          </div>
+               <span class="profile-detail-lbl">Spor Seviyesi</span>
+               <span class="profile-detail-val">${this.translateExperience(user.experienceLevel || 'beginner')}</span>
+             </div>
+             <div class="profile-detail-row">
+               <span class="profile-detail-lbl">Ortam</span>
+               <span class="profile-detail-val">${user.workoutEnvironment === 'gym' ? 'Spor Salonu' : 'Ev'}</span>
+             </div>
+             <div class="profile-detail-row">
+               <span class="profile-detail-lbl">Hedef Vücut</span>
+               <span class="profile-detail-val" style="text-transform: capitalize;">${user.targetPhysique === 'custom' ? user.customPhysique : user.targetPhysique}</span>
+             </div>
+           </div>
           
           <button class="btn btn-secondary" id="profile-edit-btn" style="width: 100%; margin-top: 20px;"><i class="fas fa-edit"></i> Profili Düzenle</button>
         </div>
@@ -420,6 +435,15 @@ class ProfileModule {
       moderate: 'Orta Aktif',
       active: 'Çok Aktif',
       very_active: 'Çok Ağır Fiziksel'
+    };
+    return mapping[lvl] || lvl;
+  }
+
+  translateExperience(lvl) {
+    const mapping = {
+      beginner: 'Başlangıç',
+      intermediate: 'Orta Seviye',
+      advanced: 'İleri Seviye'
     };
     return mapping[lvl] || lvl;
   }
