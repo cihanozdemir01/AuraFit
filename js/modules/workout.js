@@ -52,6 +52,7 @@ class WorkoutEngine {
 
   generatePlan(userParams) {
     const { goal, workoutEnvironment, equipments } = userParams;
+    const experienceLevel = userParams.experienceLevel || 'intermediate';
     
     // Filter exercises based on environment and equipments
     let availableExercises = EXERCISES.filter(ex => {
@@ -68,10 +69,16 @@ class WorkoutEngine {
       availableExercises = EXERCISES.filter(ex => ex.equipments.length === 0);
     }
 
+    const translateLevel = {
+      beginner: 'Başlangıç',
+      intermediate: 'Orta',
+      advanced: 'İleri'
+    };
+
     const plan = {
       planType: workoutEnvironment === 'gym' ? 'Spor Salonu Split Planı' : 'Evde Egzersiz Planı',
       goal: goal,
-      difficulty: 'Orta Seviye',
+      difficulty: translateLevel[experienceLevel] || 'Orta',
       days: {}
     };
 
@@ -79,19 +86,54 @@ class WorkoutEngine {
     const bodyweightOnly = availableExercises.every(ex => ex.equipments.length === 0);
     
     let dayPlans = {};
+
+    // Dynamic workout parameters based on Experience Level
+    let setsDefault = 3;
+    let repsDefault = 12;
+    let restDefault = 60;
+    let exerciseCount = 5;
+    
+    let hiitReps = 15;
+    let hiitRest = 30;
+    
+    let legsSets = 4;
+    let legsReps = 12;
+    let legsRest = 75;
+
+    if (experienceLevel === 'beginner') {
+      setsDefault = 3;
+      repsDefault = 10;
+      restDefault = 75;
+      exerciseCount = 4;
+      hiitReps = 12;
+      hiitRest = 45;
+      legsSets = 3;
+      legsReps = 10;
+      legsRest = 90;
+    } else if (experienceLevel === 'advanced') {
+      setsDefault = 4;
+      repsDefault = 10; // heavier reps
+      restDefault = 45;
+      exerciseCount = 6;
+      hiitReps = 18;
+      hiitRest = 20;
+      legsSets = 4;
+      legsReps = 10;
+      legsRest = 60;
+    }
     
     if (goal === 'lose_fat' || goal === 'endurance') {
       // High Intensity Full Body / HIIT (3-Day Split)
-      const fullBodyExs = this.selectExercises(availableExercises, ['ex_burpee', 'ex_squat', 'ex_pushup', 'ex_mountain_climber', 'ex_plank', 'ex_lunges', 'ex_leg_raise', 'ex_kb_swing'], 5);
-      const hiitExs = this.selectExercises(availableExercises, ['ex_mountain_climber', 'ex_burpee', 'ex_squat', 'ex_pushup', 'ex_plank', 'ex_wall_sit'], 5);
-      const cardioExs = this.selectExercises(availableExercises, ['ex_lunges', 'ex_leg_raise', 'ex_dips', 'ex_pushup', 'ex_plank', 'ex_kb_swing'], 5);
+      const fullBodyExs = this.selectExercises(availableExercises, ['ex_burpee', 'ex_squat', 'ex_pushup', 'ex_mountain_climber', 'ex_plank', 'ex_lunges', 'ex_leg_raise', 'ex_kb_swing'], exerciseCount);
+      const hiitExs = this.selectExercises(availableExercises, ['ex_mountain_climber', 'ex_burpee', 'ex_squat', 'ex_pushup', 'ex_plank', 'ex_wall_sit'], exerciseCount);
+      const cardioExs = this.selectExercises(availableExercises, ['ex_lunges', 'ex_leg_raise', 'ex_dips', 'ex_pushup', 'ex_plank', 'ex_kb_swing'], exerciseCount);
 
       dayPlans = {
-        'Pazartesi': this.buildWorkoutDay(fullBodyExs, 3, 12, 0, 45), // Sets, Reps, Duration, Rest
+        'Pazartesi': this.buildWorkoutDay(fullBodyExs, setsDefault, repsDefault, 0, restDefault, userParams), // Sets, Reps, Duration, Rest
         'Salı': 'Dinlenme Günü',
-        'Çarşamba': this.buildWorkoutDay(hiitExs, 3, 15, 0, 30),
+        'Çarşamba': this.buildWorkoutDay(hiitExs, setsDefault, hiitReps, 0, hiitRest, userParams),
         'Perşembe': 'Dinlenme Günü',
-        'Cuma': this.buildWorkoutDay(cardioExs, 3, 12, 0, 40),
+        'Cuma': this.buildWorkoutDay(cardioExs, setsDefault, repsDefault, 0, restDefault - 5, userParams),
         'Cumartesi': 'Aktif Dinlenme / Hafif Koşu',
         'Pazar': 'Dinlenme Günü'
       };
@@ -99,16 +141,16 @@ class WorkoutEngine {
       // Hypertrophy Muscle Gain splits
       if (workoutEnvironment === 'gym') {
         // Push / Pull / Legs Split
-        const pushExs = this.selectExercises(availableExercises, ['ex_bb_bench', 'ex_db_press', 'ex_tricep_pushdown', 'ex_db_lateral', 'ex_pushup'], 5);
-        const pullExs = this.selectExercises(availableExercises, ['ex_pullup', 'ex_lat_pulldown', 'ex_cable_row', 'ex_db_row', 'ex_db_curl'], 5);
-        const legsExs = this.selectExercises(availableExercises, ['ex_bb_squat', 'ex_leg_press', 'ex_db_goblet', 'ex_lunges', 'ex_plank'], 5);
+        const pushExs = this.selectExercises(availableExercises, ['ex_bb_bench', 'ex_db_press', 'ex_tricep_pushdown', 'ex_db_lateral', 'ex_pushup'], exerciseCount);
+        const pullExs = this.selectExercises(availableExercises, ['ex_pullup', 'ex_lat_pulldown', 'ex_cable_row', 'ex_db_row', 'ex_db_curl'], exerciseCount);
+        const legsExs = this.selectExercises(availableExercises, ['ex_bb_squat', 'ex_leg_press', 'ex_db_goblet', 'ex_lunges', 'ex_plank'], exerciseCount);
 
         dayPlans = {
-          'Pazartesi': this.buildWorkoutDay(pushExs, 4, 10, 0, 60),
+          'Pazartesi': this.buildWorkoutDay(pushExs, setsDefault, repsDefault, 0, restDefault, userParams),
           'Salı': 'Dinlenme Günü',
-          'Çarşamba': this.buildWorkoutDay(pullExs, 4, 10, 0, 60),
+          'Çarşamba': this.buildWorkoutDay(pullExs, setsDefault, repsDefault, 0, restDefault, userParams),
           'Perşembe': 'Dinlenme Günü',
-          'Cuma': this.buildWorkoutDay(legsExs, 4, 12, 0, 75),
+          'Cuma': this.buildWorkoutDay(legsExs, legsSets, legsReps, 0, legsRest, userParams),
           'Cumartesi': 'Dinlenme Günü',
           'Pazar': 'Dinlenme Günü'
         };
@@ -116,30 +158,30 @@ class WorkoutEngine {
         // Home Hypertrophy (Upper / Lower Split or Full Body Hypertrophy)
         if (bodyweightOnly) {
           // Bodyweight Progression Split
-          const w1 = this.selectExercises(availableExercises, ['ex_pushup', 'ex_squat', 'ex_dips', 'ex_lunges', 'ex_plank'], 5);
-          const w2 = this.selectExercises(availableExercises, ['ex_mountain_climber', 'ex_wall_sit', 'ex_pushup', 'ex_leg_raise', 'ex_plank'], 5);
-          const w3 = this.selectExercises(availableExercises, ['ex_dips', 'ex_squat', 'ex_pushup', 'ex_lunges', 'ex_leg_raise'], 5);
+          const w1 = this.selectExercises(availableExercises, ['ex_pushup', 'ex_squat', 'ex_dips', 'ex_lunges', 'ex_plank'], exerciseCount);
+          const w2 = this.selectExercises(availableExercises, ['ex_mountain_climber', 'ex_wall_sit', 'ex_pushup', 'ex_leg_raise', 'ex_plank'], exerciseCount);
+          const w3 = this.selectExercises(availableExercises, ['ex_dips', 'ex_squat', 'ex_pushup', 'ex_lunges', 'ex_leg_raise'], exerciseCount);
 
           dayPlans = {
-            'Pazartesi': this.buildWorkoutDay(w1, 3, 12, 0, 45),
+            'Pazartesi': this.buildWorkoutDay(w1, setsDefault, repsDefault, 0, restDefault, userParams),
             'Salı': 'Dinlenme Günü',
-            'Çarşamba': this.buildWorkoutDay(w2, 3, 15, 0, 45),
+            'Çarşamba': this.buildWorkoutDay(w2, setsDefault, repsDefault, 0, restDefault, userParams),
             'Perşembe': 'Dinlenme Günü',
-            'Cuma': this.buildWorkoutDay(w3, 3, 12, 0, 45),
+            'Cuma': this.buildWorkoutDay(w3, setsDefault, repsDefault, 0, restDefault, userParams),
             'Cumartesi': 'Dinlenme Günü',
             'Pazar': 'Dinlenme Günü'
           };
         } else {
           // Home Equipment hypertrophic mix (Upper/Lower Split)
-          const upperExs = this.selectExercises(availableExercises, ['ex_db_press', 'ex_db_chest_press', 'ex_db_row', 'ex_band_pull', 'ex_db_curl', 'ex_pushup'], 5);
-          const lowerExs = this.selectExercises(availableExercises, ['ex_db_goblet', 'ex_lunges', 'ex_kb_swing', 'ex_wall_sit', 'ex_plank', 'ex_leg_raise'], 5);
+          const upperExs = this.selectExercises(availableExercises, ['ex_db_press', 'ex_db_chest_press', 'ex_db_row', 'ex_band_pull', 'ex_db_curl', 'ex_pushup'], exerciseCount);
+          const lowerExs = this.selectExercises(availableExercises, ['ex_db_goblet', 'ex_lunges', 'ex_kb_swing', 'ex_wall_sit', 'ex_plank', 'ex_leg_raise'], exerciseCount);
 
           dayPlans = {
-            'Pazartesi': this.buildWorkoutDay(upperExs, 4, 10, 0, 60),
+            'Pazartesi': this.buildWorkoutDay(upperExs, setsDefault, repsDefault, 0, restDefault, userParams),
             'Salı': 'Dinlenme Günü',
-            'Çarşamba': this.buildWorkoutDay(lowerExs, 4, 12, 0, 60),
+            'Çarşamba': this.buildWorkoutDay(lowerExs, setsDefault, repsDefault, 0, restDefault, userParams),
             'Perşembe': 'Dinlenme Günü',
-            'Cuma': this.buildWorkoutDay(upperExs, 3, 12, 0, 60),
+            'Cuma': this.buildWorkoutDay(upperExs, setsDefault, repsDefault, 0, restDefault, userParams),
             'Cumartesi': 'Dinlenme Günü',
             'Pazar': 'Dinlenme Günü'
           };
@@ -147,16 +189,16 @@ class WorkoutEngine {
       }
     } else {
       // General Fit / Recomp: 3 Days Hypertrophy / Cardio Mix
-      const mix1 = this.selectExercises(availableExercises, ['ex_squat', 'ex_pushup', 'ex_db_row', 'ex_band_pull', 'ex_plank'], 5);
-      const mix2 = this.selectExercises(availableExercises, ['ex_mountain_climber', 'ex_lunges', 'ex_db_press', 'ex_leg_raise', 'ex_wall_sit'], 5);
-      const mix3 = this.selectExercises(availableExercises, ['ex_burpee', 'ex_db_goblet', 'ex_dips', 'ex_plank', 'ex_kb_swing'], 5);
+      const mix1 = this.selectExercises(availableExercises, ['ex_squat', 'ex_pushup', 'ex_db_row', 'ex_band_pull', 'ex_plank'], exerciseCount);
+      const mix2 = this.selectExercises(availableExercises, ['ex_mountain_climber', 'ex_lunges', 'ex_db_press', 'ex_leg_raise', 'ex_wall_sit'], exerciseCount);
+      const mix3 = this.selectExercises(availableExercises, ['ex_burpee', 'ex_db_goblet', 'ex_dips', 'ex_plank', 'ex_kb_swing'], exerciseCount);
 
       dayPlans = {
-        'Pazartesi': this.buildWorkoutDay(mix1, 3, 12, 0, 45),
+        'Pazartesi': this.buildWorkoutDay(mix1, setsDefault, repsDefault, 0, restDefault, userParams),
         'Salı': 'Dinlenme Günü',
-        'Çarşamba': this.buildWorkoutDay(mix2, 3, 12, 0, 45),
+        'Çarşamba': this.buildWorkoutDay(mix2, setsDefault, repsDefault, 0, restDefault, userParams),
         'Perşembe': 'Dinlenme Günü',
-        'Cuma': this.buildWorkoutDay(mix3, 3, 12, 0, 45),
+        'Cuma': this.buildWorkoutDay(mix3, setsDefault, repsDefault, 0, restDefault, userParams),
         'Cumartesi': 'Dinlenme Günü',
         'Pazar': 'Dinlenme Günü'
       };
@@ -185,14 +227,159 @@ class WorkoutEngine {
     return list.slice(0, count);
   }
 
-  buildWorkoutDay(exercises, sets, reps, duration, restTime) {
-    return exercises.map(ex => ({
-      exerciseId: ex.id,
-      sets: sets,
-      reps: reps,
-      duration: duration, // 0 means rep-based
-      restTime: restTime // Rest between sets in seconds
-    }));
+  buildWorkoutDay(exercises, sets, reps, duration, restTime, userParams = {}) {
+    const level = userParams.experienceLevel || 'intermediate';
+    const gender = userParams.gender || 'male';
+    const weight = userParams.weight || 70;
+    
+    return exercises.map(ex => {
+      const recWeight = this.getRecommendedWeight(ex.id, level, gender, weight);
+      return {
+        exerciseId: ex.id,
+        sets: sets,
+        reps: reps,
+        duration: duration, // 0 means rep-based
+        restTime: restTime, // Rest between sets in seconds
+        weight: recWeight
+      };
+    });
+  }
+
+  getBarbellPlates(totalWeight) {
+    const barWeight = totalWeight >= 20 ? 20 : 10;
+    const platesWeight = (totalWeight - barWeight) / 2;
+    if (platesWeight === 0) {
+      return `${totalWeight} kg (Barbell) [${barWeight} kg Bar]`;
+    }
+    return `${totalWeight} kg (Barbell) [${barWeight} kg Bar + 2x ${platesWeight} kg Plaka]`;
+  }
+
+  getDumbbellDetail(weightPerHand) {
+    return `${weightPerHand} kg (Dumbbell) [Çift - Her elde ${weightPerHand} kg]`;
+  }
+
+  getRecommendedWeight(exerciseId, level, gender, userWeight) {
+    const isMale = gender === 'male';
+
+    // Bodyweight exercises
+    const bodyweightExercises = [
+      'ex_pushup', 'ex_squat', 'ex_plank', 'ex_lunges', 'ex_mountain_climber',
+      'ex_burpee', 'ex_leg_raise', 'ex_dips', 'ex_wall_sit', 'ex_pullup', 'ex_hanging_knees'
+    ];
+    if (bodyweightExercises.includes(exerciseId)) {
+      return 'Vücut Ağırlığı';
+    }
+
+    // Resistance Band exercises
+    const bandExercises = ['ex_band_pull', 'ex_band_row', 'ex_band_squat', 'ex_band_curl'];
+    if (bandExercises.includes(exerciseId)) {
+      if (level === 'beginner') return 'Hafif Direnç Bandı';
+      if (level === 'advanced') return 'Ağır Direnç Bandı';
+      return 'Orta Direnç Bandı';
+    }
+
+    // Dumbbell Exercises - Small muscle groups / isolation
+    const dbSmallExs = ['ex_db_curl', 'ex_db_lateral'];
+    if (dbSmallExs.includes(exerciseId)) {
+      if (isMale) {
+        if (level === 'beginner') return this.getDumbbellDetail(5);
+        if (level === 'advanced') return this.getDumbbellDetail(12.5);
+        return this.getDumbbellDetail(7.5);
+      } else {
+        if (level === 'beginner') return this.getDumbbellDetail(2.5);
+        if (level === 'advanced') return this.getDumbbellDetail(7.5);
+        return this.getDumbbellDetail(5);
+      }
+    }
+
+    // Dumbbell Exercises - Large muscle groups / compounds
+    const dbLargeExs = ['ex_db_press', 'ex_db_chest_press', 'ex_db_row', 'ex_db_goblet'];
+    if (dbLargeExs.includes(exerciseId)) {
+      if (isMale) {
+        if (level === 'beginner') return this.getDumbbellDetail(7.5);
+        if (level === 'advanced') return this.getDumbbellDetail(20);
+        return this.getDumbbellDetail(12.5);
+      } else {
+        if (level === 'beginner') return this.getDumbbellDetail(4);
+        if (level === 'advanced') return this.getDumbbellDetail(10);
+        return this.getDumbbellDetail(6);
+      }
+    }
+
+    // Kettlebell Exercises
+    const kbExs = ['ex_kb_swing', 'ex_kb_squat'];
+    if (kbExs.includes(exerciseId)) {
+      if (isMale) {
+        if (level === 'beginner') return '8 kg (Kettlebell)';
+        if (level === 'advanced') return '20 kg (Kettlebell)';
+        return '12 kg (Kettlebell)';
+      } else {
+        if (level === 'beginner') return '4 kg (Kettlebell)';
+        if (level === 'advanced') return '12 kg (Kettlebell)';
+        return '8 kg (Kettlebell)';
+      }
+    }
+
+    // Barbell Exercises
+    if (exerciseId === 'ex_bb_bench') {
+      if (isMale) {
+        if (level === 'beginner') return this.getBarbellPlates(30);
+        if (level === 'advanced') return this.getBarbellPlates(70);
+        return this.getBarbellPlates(45);
+      } else {
+        if (level === 'beginner') return this.getBarbellPlates(15);
+        if (level === 'advanced') return this.getBarbellPlates(35);
+        return this.getBarbellPlates(20);
+      }
+    }
+    if (exerciseId === 'ex_bb_squat') {
+      if (isMale) {
+        if (level === 'beginner') return this.getBarbellPlates(40);
+        if (level === 'advanced') return this.getBarbellPlates(90);
+        return this.getBarbellPlates(60);
+      } else {
+        if (level === 'beginner') return this.getBarbellPlates(20);
+        if (level === 'advanced') return this.getBarbellPlates(50);
+        return this.getBarbellPlates(30);
+      }
+    }
+
+    // Machines & Cables
+    if (exerciseId === 'ex_leg_press') {
+      if (isMale) {
+        if (level === 'beginner') return '50 kg';
+        if (level === 'advanced') return '150 kg';
+        return '90 kg';
+      } else {
+        if (level === 'beginner') return '30 kg';
+        if (level === 'advanced') return '90 kg';
+        return '50 kg';
+      }
+    }
+    if (['ex_lat_pulldown', 'ex_cable_row'].includes(exerciseId)) {
+      if (isMale) {
+        if (level === 'beginner') return '30 kg';
+        if (level === 'advanced') return '65 kg';
+        return '45 kg';
+      } else {
+        if (level === 'beginner') return '15 kg';
+        if (level === 'advanced') return '35 kg';
+        return '25 kg';
+      }
+    }
+    if (exerciseId === 'ex_tricep_pushdown') {
+      if (isMale) {
+        if (level === 'beginner') return '15 kg';
+        if (level === 'advanced') return '35 kg';
+        return '25 kg';
+      } else {
+        if (level === 'beginner') return '7.5 kg';
+        if (level === 'advanced') return '20 kg';
+        return '12.5 kg';
+      }
+    }
+
+    return 'Ortalama Ağırlık';
   }
 
   getDayName(idx) {
@@ -275,6 +462,7 @@ class WorkoutEngine {
                   <span><i class="fas fa-sync-alt"></i> ${we.sets} Set</span>
                   <span><i class="fas fa-redo"></i> ${we.reps > 0 ? `${we.reps} Tekrar` : `${we.duration} sn`}</span>
                   <span><i class="fas fa-chair"></i> ${we.restTime} sn Dinlenme</span>
+                  ${we.weight ? `<span><i class="fas fa-weight-hanging"></i> ${we.weight}</span>` : ''}
                 </span>
                 <p class="text-secondary" style="font-size: 12px; margin-top: 6px;">${exDetail.description}</p>
               </div>
@@ -300,12 +488,25 @@ class WorkoutEngine {
       `;
     }
 
+    const userLevel = state.user?.experienceLevel || 'intermediate';
+
     container.innerHTML = `
       <div>
         <div class="page-header">
           <div>
             <h1 class="page-title">Egzersiz Programım</h1>
-            <p class="page-subtitle">${plan.planType} — Hedef: ${this.translateGoal(plan.goal)}</p>
+            <p class="page-subtitle" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <span>${plan.planType}</span>
+              <span>•</span>
+              <span>Hedef: ${this.translateGoal(plan.goal)}</span>
+              <span>•</span>
+              <span>Seviye:</span>
+              <select id="workout-level-selector" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--accent-cyan); font-weight: 600; padding: 4px 10px; border-radius: 8px; cursor: pointer; outline: none; font-size: 13px;">
+                <option value="beginner" ${userLevel === 'beginner' ? 'selected' : ''} style="background: var(--bg-secondary); color: var(--text-primary);">Başlangıç</option>
+                <option value="intermediate" ${userLevel === 'intermediate' ? 'selected' : ''} style="background: var(--bg-secondary); color: var(--text-primary);">Orta</option>
+                <option value="advanced" ${userLevel === 'advanced' ? 'selected' : ''} style="background: var(--bg-secondary); color: var(--text-primary);">İleri</option>
+              </select>
+            </p>
           </div>
         </div>
       </div>
@@ -319,6 +520,23 @@ class WorkoutEngine {
         ${contentHtml}
       </div>
     `;
+
+    // Bind Level Switch Event
+    container.querySelector('#workout-level-selector')?.addEventListener('change', (e) => {
+      const newLevel = e.target.value;
+      const currentState = store.getState();
+      const updatedUser = {
+        ...currentState.user,
+        experienceLevel: newLevel
+      };
+      
+      store.setUser(updatedUser);
+      
+      const newPlan = this.generatePlan(updatedUser);
+      store.setWorkoutPlan(newPlan);
+      
+      this.renderWorkoutTab(container, activeDayName);
+    });
 
     // Bind Day Switch Events
     container.querySelectorAll('.day-tab').forEach(tab => {
