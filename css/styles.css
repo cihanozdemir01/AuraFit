@@ -1235,6 +1235,48 @@ input:focus, select:focus, textarea:focus {
   font-weight: 600;
 }
 
+/* Dashboard Custom Classes */
+.dashboard-hero {
+  background: linear-gradient(135deg, rgba(0, 229, 255, 0.1), rgba(41, 121, 255, 0.02));
+  border-color: rgba(0, 229, 255, 0.2) !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px;
+}
+.dashboard-hero-title {
+  font-size: 28px !important;
+}
+.dashboard-hero-subtitle {
+  margin-top: 4px;
+  font-size: 14px;
+}
+.dashboard-hero-right {
+  font-family: var(--font-display);
+  text-align: right;
+}
+.dashboard-hero-metric {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--accent-cyan);
+}
+.dashboard-hero-metric-label {
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.dashboard-workout-card {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+.dashboard-workout-details {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 /* Responsive Styles */
 @media (max-width: 1024px) {
   .sidebar {
@@ -1313,5 +1355,70 @@ input:focus, select:focus, textarea:focus {
   }
   .form-row {
     grid-template-columns: 1fr;
+  }
+
+  /* Mobile Overrides for Onboarding & Dashboard */
+  .onboarding-overlay {
+    padding: 10px;
+  }
+  .onboarding-box {
+    padding: 24px 16px;
+    max-height: 95vh;
+    gap: 16px;
+  }
+  .onboarding-title {
+    font-size: 20px;
+  }
+  .grid-options {
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 8px;
+  }
+  .grid-option-card {
+    padding: 12px 8px;
+    font-size: 13px;
+  }
+  .grid-option-card i {
+    font-size: 18px;
+  }
+  .checkbox-options {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+  }
+  .checkbox-option-card {
+    padding: 12px;
+    font-size: 13px;
+    gap: 8px;
+  }
+  input[type="text"], input[type="number"], select, textarea {
+    font-size: 16px; /* Prevents auto-zoom on mobile WebView */
+  }
+
+  .dashboard-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+  }
+  .dashboard-hero-title {
+    font-size: 22px !important;
+  }
+  .dashboard-hero-right {
+    text-align: left;
+  }
+  .dashboard-hero-metric {
+    font-size: 28px;
+  }
+
+  .summary-cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .dashboard-workout-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+    padding: 20px;
   }
 }
