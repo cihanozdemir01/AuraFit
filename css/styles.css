@@ -459,6 +459,7 @@ label {
 }
 
 input[type="text"], input[type="number"], select, textarea {
+  width: 100%;
   background-color: var(--bg-primary);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
@@ -1499,5 +1500,17 @@ input:focus, select:focus, textarea:focus {
   }
   .exercise-meta-container {
     gap: 10px;
+  }
+
+  .glass-card {
+    padding: 16px;
+  }
+
+  .dashboard-grid, .nutrition-grid, .progress-grid, .profile-grid {
+    gap: 16px;
+  }
+
+  .form-row {
+    gap: 12px;
   }
 }
