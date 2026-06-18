@@ -489,6 +489,11 @@ class WorkoutEngine {
     }
 
     const userLevel = state.user?.experienceLevel || 'intermediate';
+    const levelsMap = {
+      beginner: 'Başlangıç',
+      intermediate: 'Orta',
+      advanced: 'İleri'
+    };
 
     container.innerHTML = `
       <div>
@@ -500,12 +505,7 @@ class WorkoutEngine {
               <span>•</span>
               <span>Hedef: ${this.translateGoal(plan.goal)}</span>
               <span>•</span>
-              <span>Seviye:</span>
-              <select id="workout-level-selector" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--accent-cyan); font-weight: 600; padding: 4px 10px; border-radius: 8px; cursor: pointer; outline: none; font-size: 13px;">
-                <option value="beginner" ${userLevel === 'beginner' ? 'selected' : ''} style="background: var(--bg-secondary); color: var(--text-primary);">Başlangıç</option>
-                <option value="intermediate" ${userLevel === 'intermediate' ? 'selected' : ''} style="background: var(--bg-secondary); color: var(--text-primary);">Orta</option>
-                <option value="advanced" ${userLevel === 'advanced' ? 'selected' : ''} style="background: var(--bg-secondary); color: var(--text-primary);">İleri</option>
-              </select>
+              <span>Seviye: <strong style="color: var(--accent-cyan);">${levelsMap[userLevel] || userLevel}</strong></span>
             </p>
           </div>
         </div>
@@ -521,22 +521,6 @@ class WorkoutEngine {
       </div>
     `;
 
-    // Bind Level Switch Event
-    container.querySelector('#workout-level-selector')?.addEventListener('change', (e) => {
-      const newLevel = e.target.value;
-      const currentState = store.getState();
-      const updatedUser = {
-        ...currentState.user,
-        experienceLevel: newLevel
-      };
-      
-      store.setUser(updatedUser);
-      
-      const newPlan = this.generatePlan(updatedUser);
-      store.setWorkoutPlan(newPlan);
-      
-      this.renderWorkoutTab(container, activeDayName);
-    });
 
     // Bind Day Switch Events
     container.querySelectorAll('.day-tab').forEach(tab => {
