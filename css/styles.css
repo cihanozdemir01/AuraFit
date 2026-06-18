@@ -1514,3 +1514,36 @@ input:focus, select:focus, textarea:focus {
     gap: 12px;
   }
 }
+
+/* Toast Notification */
+.toast-notification {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--accent-cyan);
+  border-left: 4px solid var(--accent-cyan);
+  color: var(--text-primary);
+  padding: 14px 20px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  z-index: 9999;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideInUp 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+  pointer-events: none;
+}
+
+@keyframes slideInUp {
+  from { transform: translateY(100px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
