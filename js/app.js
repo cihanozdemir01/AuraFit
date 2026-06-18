@@ -39,10 +39,33 @@ class App {
       this.renderActiveTab();
     }
 
-    // 5. Global Custom Event Listeners (for inter-module routing)
+    // 5. Global Custom Event Listeners (for inter-module routing & notifications)
     window.addEventListener('switch-tab', (e) => {
       this.switchTab(e.detail.tabId);
     });
+    window.addEventListener('show-toast', (e) => {
+      this.showToast(e.detail.message, e.detail.type);
+    });
+  }
+
+  showToast(message, type = 'info') {
+    // Remove existing toasts
+    document.querySelectorAll('.toast-notification').forEach(t => t.remove());
+
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    if (type === 'success') {
+      toast.style.borderColor = 'var(--accent-emerald)';
+      toast.style.borderLeftColor = 'var(--accent-emerald)';
+      toast.innerHTML = `<i class="fas fa-check-circle" style="color: var(--accent-emerald); font-size: 16px;"></i> <span>${message}</span>`;
+    } else {
+      toast.innerHTML = `<i class="fas fa-info-circle" style="color: var(--accent-cyan); font-size: 16px;"></i> <span>${message}</span>`;
+    }
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.remove();
+    }, 3000);
   }
 
   bindNavigation() {
