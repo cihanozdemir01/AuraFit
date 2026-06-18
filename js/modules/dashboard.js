@@ -71,14 +71,14 @@ class Dashboard {
 
     container.innerHTML = `
       <!-- Hero Welcome Banner -->
-      <div class="glass-card" style="background: linear-gradient(135deg, rgba(0, 229, 255, 0.1), rgba(41, 121, 255, 0.02)); border-color: rgba(0, 229, 255, 0.2); display: flex; justify-content: space-between; align-items: center; padding: 30px;">
+      <div class="glass-card dashboard-hero">
         <div>
-          <h1 class="page-title" style="font-size: 28px;">Tekrar Hoş Geldin, ${user.name}!</h1>
-          <p class="text-secondary" style="margin-top: 4px; font-size: 14px;">Bugün hedeflerine bir adım daha yaklaşmak için harika bir gün. Programını tamamlamayı unutma!</p>
+          <h1 class="page-title dashboard-hero-title">Tekrar Hoş Geldin, ${user.name}!</h1>
+          <p class="text-secondary dashboard-hero-subtitle">Bugün hedeflerine bir adım daha yaklaşmak için harika bir gün. Programını tamamlamayı unutma!</p>
         </div>
-        <div style="font-family: var(--font-display); text-align: right;">
-          <span style="font-size: 32px; font-weight: 800; color: var(--accent-cyan);">%${waterProgressPerc}</span><br>
-          <span class="text-secondary" style="font-size: 11px; text-transform: uppercase;">Su Hedefi</span>
+        <div class="dashboard-hero-right">
+          <span class="dashboard-hero-metric">%${waterProgressPerc}</span><br>
+          <span class="text-secondary dashboard-hero-metric-label">Su Hedefi</span>
         </div>
       </div>
 
@@ -113,7 +113,7 @@ class Dashboard {
         <!-- Left Column: Workout & Progress -->
         <div style="display: flex; flex-direction: column; gap: 32px;">
           <!-- Workout Card -->
-          <div class="glass-card" style="display: flex; gap: 24px; align-items: center;">
+          <div class="glass-card dashboard-workout-card">
             <div class="progress-ring-container">
               <svg class="progress-ring" width="140" height="140">
                 <circle class="progress-ring-circle-bg" cx="70" cy="70" r="60" />
@@ -125,7 +125,7 @@ class Dashboard {
               </div>
             </div>
 
-            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 8px;">
+            <div class="dashboard-workout-details">
               <span class="text-secondary" style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">BUGÜNÜN PROGRAMI</span>
               <h2 style="font-family: var(--font-display); font-size: 22px;">${isRest ? 'Dinlenme Günü' : todayName + ' Antrenmanı'}</h2>
               <p class="text-secondary" style="font-size: 13px;">${workoutProgressText}</p>
