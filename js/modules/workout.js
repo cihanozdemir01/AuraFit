@@ -478,7 +478,7 @@ class WorkoutEngine {
         : `<button class="btn btn-primary" id="start-workout-btn" data-day="${dayToShow}"><i class="fas fa-play"></i> Antrenmanı Başlat</button>`;
 
       contentHtml = `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <div class="workout-day-header">
           <h3 class="page-subtitle">${dayToShow} Programı (${exercises.length} Egzersiz)</h3>
           ${actionButton}
         </div>
