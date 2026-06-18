@@ -224,7 +224,7 @@ class ProfileModule {
             const newNutrition = nutritionEngine.calculatePlan(updatedUser);
             store.setNutritionTargets(newNutrition.calories, newNutrition.protein, newNutrition.carbs, newNutrition.fats);
             
-            alert('Profil bilgileriniz güncellendi. Egzersiz ve beslenme planlarınız otomatik olarak yeniden yapılandırıldı!');
+            window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Profiliniz başarıyla güncellendi!', type: 'success' } }));
             
             this.isEditing = false;
             this.renderProfileTab(container);
@@ -401,7 +401,7 @@ class ProfileModule {
       import('./workout.js').then(({ workoutEngine }) => {
         const newPlan = workoutEngine.generatePlan(userParams);
         store.setWorkoutPlan(newPlan);
-        alert('Ekipmanlar güncellendi ve egzersiz programınız yeniden yapılandırıldı!');
+        window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Ekipmanlarınız başarıyla güncellendi!', type: 'success' } }));
         this.renderProfileTab(container);
       });
     });
