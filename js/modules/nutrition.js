@@ -176,12 +176,12 @@ class NutritionEngine {
           <div class="glass-card">
             <h2 style="font-family: var(--font-display); font-size: 20px; margin-bottom: 16px;">Bugünkü Hedef Makrolar</h2>
             
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <div class="nutrition-target-header">
               <div>
-                <span style="font-size: 32px; font-weight: 800; font-family: var(--font-display); color: var(--accent-orange);">${nutrition.caloriesIntake || 0}</span>
+                <span class="nutrition-calories-num">${nutrition.caloriesIntake || 0}</span>
                 <span class="text-secondary" style="font-size: 14px;"> / ${nutrition.caloriesTarget} kcal Alındı</span>
               </div>
-              <div class="text-secondary" style="font-size: 13px; text-align: right;">
+              <div class="text-secondary nutrition-target-details">
                 Bazal Metabolizma: ${Math.round(nutrition.caloriesTarget * 0.8)} kcal<br>
                 TDEE Hedef Tipi: ${this.translateGoal(user.goal)}
               </div>
@@ -278,7 +278,7 @@ class NutritionEngine {
             <p class="text-secondary" style="font-size: 12px; margin-bottom: 16px;">Tükettiğiniz ekstra yiyecekleri kütüphaneden aratarak veya elle girerek listenize ekleyin.</p>
             
             <form id="extra-food-form" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px;">
-              <div class="form-row" style="grid-template-columns: 2.5fr 1fr; gap: 16px;">
+              <div class="extra-food-row">
                 <div class="form-group">
                   <label for="extra-food-name">Yiyecek Adı</label>
                   <input type="text" id="extra-food-name" list="foods-datalist" placeholder="Arayın... Örn: Muz" required style="font-size: 14px;">
@@ -299,7 +299,7 @@ class NutritionEngine {
               </div>
 
               <!-- Manual inputs (hidden by default) -->
-              <div id="extra-food-manual-fields" class="form-row" style="display: none; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 4px;">
+              <div id="extra-food-manual-fields" class="manual-macro-row" style="display: none;">
                 <div class="form-group">
                   <label style="font-size: 11px;">Kalori (kcal)</label>
                   <input type="number" id="manual-calories" placeholder="0" min="0" style="padding: 8px 10px; font-size: 13px;">
